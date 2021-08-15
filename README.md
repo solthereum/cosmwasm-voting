@@ -47,9 +47,9 @@ You need an environment to run contracts. You can either run your node locally o
 
 **To verify testnet is currently running, make sure the following URLs are all working for you:**
 
-http://rpc.oysternet.cosmwasm.com/status
-https://faucet.oysternet.cosmwasm.com/status
-http://lcd.oysternet.cosmwasm.com/node_info
+ - http://rpc.oysternet.cosmwasm.com/status
+ - https://faucet.oysternet.cosmwasm.com/status
+ - http://lcd.oysternet.cosmwasm.com/node_info
 
 ## Setup Go CLI
 
@@ -139,7 +139,7 @@ $ REG = $(jq -n --arg bob $(wasmd keys show -a bob) '{"register":{"voter":$bob}}
 $ wasmd tx wasm execute  $CONTRACT "$REG" --from fred $TXFLAG -y
 ```
 
-**Casting vote to particular candidate**
+**Casting vote to a particular candidate**
 
 ```
 $ CASTVOTE = $(jq -n --arg bob $(wasmd keys show -a bob) --arg fred $(wasmd keys show -a fred) '{"cast_vote":{"voter":$fred,"candidate":$bob}}')
@@ -148,19 +148,19 @@ $ wasmd tx wasm execute  $CONTRACT "$CASTVOTE" --from fred $TXFLAG -y
 
 ## Querying the Contract details
 
-**To find number of voters inside contract**
+**To find how many number of voters inside contract**
 
 ```
 $ wasmd query wasm contract-state smart $CONTRACT '{"voters": {}}' $NODE
 ```
 
-**To find number of candidates inside contract**
+**To find how many number of candidates inside contract**
 
 ```
 $ wasmd query wasm contract-state smart $CONTRACT '{"candidates": {}}' $NODE
 ```
 
-**To find number of casted to a particular voter inside contract**
+**To find how many number of casted votes of a particular candidate inside contract**
 
 ```
 $ VOTES = $(jq -n --arg bob $(wasmd keys show -a bob) '{"votes":{"candidate":$bob}}')
