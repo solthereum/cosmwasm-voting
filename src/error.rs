@@ -8,6 +8,19 @@ pub enum ContractError {
 
     #[error("Unauthorized")]
     Unauthorized {},
-    // Add any other custom errors you like here.
-    // Look at https://docs.rs/thiserror/1.0.21/thiserror/ for details.
+
+    #[error("Your details has already exists in voters list, you cannot create again!!")]
+    VoterAlreadyExists {},
+
+    #[error("Your details are not present in voters list")]
+    VoterNotFound {},
+
+    #[error("Unknown voter cannot become candidate, he has to register as voter first")]
+    NotAVoter {},
+
+    #[error("Voter has already been voted")]
+    AlreadyVoted {},
+
+    #[error("This candidate is not present in the candidates list, he has to register first")]
+    NotACandidate {},
 }
