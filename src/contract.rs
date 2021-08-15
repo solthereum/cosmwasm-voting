@@ -60,6 +60,46 @@ pub fn create_voter(deps: DepsMut, voter_address: String, name: String) -> Resul
     Ok(Response::default())
 }
 
+fn has_voted(voter: &Addr, state: &State) -> bool {
+    state.voted.iter().any(|i| i == voter)
+}
+
+fn is_candidate(candidate: &Addr, state: &State) -> bool {
+    state.candidates.iter().any(|i| i == candidate)
+}
+
+pub fn cast_vote(deps: DepsMut, voter: String, candidate: String) -> Result<Response, ContractError> {
+    let voter_address = deps.api.addr_validate(&voter.as_str())?;
+    let candidate_address = deps.api.addr_validate(&candidate.as_str())?;
+
+    let state = STATE.load(deps.storage)?;
+
+    if has_voted(&voter_address, &state) {
+        return Err(ContractError::AlreadyVoted {});
+    }
+
+    if is_voter(&voter_address, &state) == false {
+        return Err(ContractError::VoterNotFound {});
+    }
+
+    if is_candidate(&candidate_address, &state) == false {
+        return Err(ContractError::NotACandidate {});
+    }
+
+    let mut votes= VOTES.load(deps.storage, &candidate)?;
+    votes.voters.push(voter);
+    votes.count += 1;
+
+    VOTES.save(deps.storage, &candidate, &votes)?;
+
+    STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
+        state.voted.push(voter_address);
+        Ok(state)
+    })?;
+
+    Ok(Response::default())
+}
+
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
