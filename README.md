@@ -1,6 +1,6 @@
 # CosmWasm Voting Smart Contract
 
-CosmWasm template is used to build voting smart contract in Rust to run inside a
+CosmWasm template is used to build Voting Smart Contract in Rust to run inside a
 [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) module on all chains that enable it.
 
 ## Common setup
