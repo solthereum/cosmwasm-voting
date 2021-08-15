@@ -23,8 +23,18 @@ pub enum QueryMsg {
     Votes { candidate: String }
 }
 
-// We define a custom struct for each query response
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct CountResponse {
-    pub count: i32,
+pub struct VotersResponse {
+    pub voters: Vec<Voter>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct CandidatesResponse {
+    pub candidates: Vec<Addr>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct VotesResponse {
+    pub voters: Vec<String>,
+    pub count: u64
 }
