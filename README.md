@@ -1,12 +1,88 @@
-# CosmWasm Starter Pack
+# CosmWasm Voting Smart Contract
 
-This is a template to build smart contracts in Rust to run inside a
+CosmWasm template is used to build voting smart contract in Rust to run inside a
 [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) module on all chains that enable it.
-To understand the framework better, please read the overview in the
-[cosmwasm repo](https://github.com/CosmWasm/cosmwasm/blob/master/README.md),
-and dig into the [cosmwasm docs](https://www.cosmwasm.com).
-This assumes you understand the theory and just want to get coding.
 
+## Common setup
+
+Clone the repo.
+
+```
+$ git clone https://github.com/shaikrasheed99/cosmwasm-voting-smartcontract.git
+$ cd cosmwasm-voting-smartcontract
+```
+
+Install dependencies.
+
+Wasmd is the backbone of CosmWasm platform. It is the implementation of a Cosmoszone with wasm smart contracts enabled. To edit or run a contract, you need wasmd.
+
+```
+$ git clone https://github.com/CosmWasm/wasmd.git
+$ cd wasmd
+$ git checkout v0.16.0
+$ make install
+```
+
+Verify the installation.
+```
+$ wasmd version
+```
+
+## Compile the wasm contract with stable toolchain
+
+```
+$ rustup default stable
+$ cargo wasm
+```
+
+To produce a much smaller version, you can run this which tells the compiler to strip all unused code out
+
+```
+$ RUSTFLAGS='-C link-arg=-s' cargo wasm
+```
+
+## Setting Up Environment
+
+You need an environment to run contracts. You can either run your node locally or connect to an existing network. For easy testing, oysternet network is online, you can use it to deploy and run your contracts
+
+To verify testnet is currently running, make sure the following URLs are all working for you:
+
+http://rpc.oysternet.cosmwasm.com/status
+https://faucet.oysternet.cosmwasm.com/status
+http://lcd.oysternet.cosmwasm.com/node_info
+
+## Setup Go CLI
+
+Let's configure wasmd exec, point it to testnets, create wallet and ask tokens from faucet.
+
+First source the oysternet network configurations to the shell:
+
+```
+$ source <(curl -sSL https://raw.githubusercontent.com/CosmWasm/testnets/master/oysternet-1/defaults.env)
+```
+
+Setup the client:
+
+```
+$ wasmd keys add fred
+$ wasmd keys add bob
+```
+
+Requesting tokens from faucet:
+
+```
+$ JSON=$(jq -n --arg addr $(wasmd keys show -a fred) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
+$ JSON=$(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
+```
+
+Export wasmd Parameters
+
+If you intend to use wasmd as client, we recommend you to setup these variables. Otherwise You will have to define type in node, chain id and gas-prices details with every command you execute
+
+```
+$ export NODE="--node $RPC"
+$ export TXFLAG="${NODE} --chain-id ${CHAIN_ID} --gas-prices 0.001usponge --gas auto --gas-adjustment 1.3"
+```
 ## Creating a new repo from template
 
 Assuming you have a recent version of rust and cargo (v1.51.0+) installed
@@ -29,87 +105,4 @@ Go to the folder in which you want to place it and run:
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PROJECT_NAME
-````
-
-**0.13**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.13 --name PROJECT_NAME
-````
-
-**0.12**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.12 --name PROJECT_NAME
 ```
-
-**0.11**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.11 --name PROJECT_NAME
-```
-**0.10**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.10 --name PROJECT_NAME
-```
-
-**0.9**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.9 --name PROJECT_NAME
-```
-
-**0.8**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.8 --name PROJECT_NAME
-```
-
-You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
-containing a simple working contract and build system that you can customize.
-
-## Create a Repo
-
-After generating, you have a initialized local git repo, but no commits, and no remote.
-Go to a server (eg. github) and create a new upstream repo (called `YOUR-GIT-URL` below).
-Then run the following:
-
-```sh
-# this is needed to create a valid Cargo.lock file (see below)
-cargo check
-git branch -M main
-git add .
-git commit -m 'Initial Commit'
-git remote add origin YOUR-GIT-URL
-git push -u origin master
-```
-
-## CI Support
-
-We have template configurations for both [GitHub Actions](.github/workflows/Basic.yml)
-and [Circle CI](.circleci/config.yml) in the generated project, so you can
-get up and running with CI right away.
-
-One note is that the CI runs all `cargo` commands
-with `--locked` to ensure it uses the exact same versions as you have locally. This also means
-you must have an up-to-date `Cargo.lock` file, which is not auto-generated.
-The first time you set up the project (or after adding any dep), you should ensure the
-`Cargo.lock` file is updated, so the CI will test properly. This can be done simply by
-running `cargo check` or `cargo unit-test`.
-
-## Using your project
-
-Once you have your custom repo, you should check out [Developing](./Developing.md) to explain
-more on how to run tests and develop code. Or go through the
-[online tutorial](https://www.cosmwasm.com/docs/getting-started/intro) to get a better feel
-of how to develop.
-
-[Publishing](./Publishing.md) contains useful information on how to publish your contract
-to the world, once you are ready to deploy it on a running blockchain. And
-[Importing](./Importing.md) contains information about pulling in other contracts or crates
-that have been published.
-
-Please replace this README file with information about your specific project. You can keep
-the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
-proper description in the README.
