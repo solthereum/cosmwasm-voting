@@ -121,15 +121,14 @@ pub fn register(deps: DepsMut, voter_address: String) -> Result<Response, Contra
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
-    }
-}
-#[entry_point]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
-    match msg {
         QueryMsg::Config {} => to_binary(&STATE.load(deps.storage)?),
         QueryMsg::Voters {} => to_binary(&query_voters(deps)?),
         QueryMsg::Candidates {} => to_binary(&query_candidates(deps)?),
         QueryMsg::Votes {candidate} => to_binary(&query_votes(deps, candidate)?)
     }
+}
+
+fn query_voters(deps: Deps) -> StdResult<VotersResponse> {
+    let state = STATE.load(deps.storage)?;
+    Ok(VotersResponse { voters: state.voters })
 }
