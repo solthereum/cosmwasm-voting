@@ -5,11 +5,23 @@
     {
       "type": "object",
       "required": [
-        "increment"
+        "create_voter"
       ],
       "properties": {
-        "increment": {
-          "type": "object"
+        "create_voter": {
+          "type": "object",
+          "required": [
+            "address",
+            "name"
+          ],
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
         }
       },
       "additionalProperties": false
@@ -17,18 +29,41 @@
     {
       "type": "object",
       "required": [
-        "reset"
+        "cast_vote"
       ],
       "properties": {
-        "reset": {
+        "cast_vote": {
           "type": "object",
           "required": [
-            "count"
+            "candidate",
+            "voter"
           ],
           "properties": {
-            "count": {
-              "type": "integer",
-              "format": "int32"
+            "candidate": {
+              "type": "string"
+            },
+            "voter": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "register"
+      ],
+      "properties": {
+        "register": {
+          "type": "object",
+          "required": [
+            "voter"
+          ],
+          "properties": {
+            "voter": {
+              "type": "string"
             }
           }
         }

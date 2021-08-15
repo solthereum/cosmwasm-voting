@@ -5,11 +5,55 @@
     {
       "type": "object",
       "required": [
-        "get_count"
+        "config"
       ],
       "properties": {
-        "get_count": {
+        "config": {
           "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "voters"
+      ],
+      "properties": {
+        "voters": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "candidates"
+      ],
+      "properties": {
+        "candidates": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "votes"
+      ],
+      "properties": {
+        "votes": {
+          "type": "object",
+          "required": [
+            "candidate"
+          ],
+          "properties": {
+            "candidate": {
+              "type": "string"
+            }
+          }
         }
       },
       "additionalProperties": false
