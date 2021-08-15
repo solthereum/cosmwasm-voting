@@ -5,14 +5,14 @@ CosmWasm template is used to build voting smart contract in Rust to run inside a
 
 ## Common setup
 
-Clone the repo.
+**Clone the voting smart contract repo.**
 
 ```
 $ git clone https://github.com/shaikrasheed99/cosmwasm-voting-smartcontract.git
 $ cd cosmwasm-voting-smartcontract
 ```
 
-Install dependencies.
+**Install dependencies.**
 
 Wasmd is the backbone of CosmWasm platform. It is the implementation of a Cosmoszone with wasm smart contracts enabled. To edit or run a contract, you need wasmd.
 
@@ -23,7 +23,7 @@ $ git checkout v0.16.0
 $ make install
 ```
 
-Verify the installation.
+**Verify the wasmd installation.**
 ```
 $ wasmd version
 ```
@@ -35,7 +35,7 @@ $ rustup default stable
 $ cargo wasm
 ```
 
-To produce a much smaller version, you can run this which tells the compiler to strip all unused code out
+To produce a much smaller version, you can run this which tells the compiler to strip all unused code out.
 
 ```
 $ RUSTFLAGS='-C link-arg=-s' cargo wasm
@@ -43,9 +43,9 @@ $ RUSTFLAGS='-C link-arg=-s' cargo wasm
 
 ## Setting Up Environment
 
-You need an environment to run contracts. You can either run your node locally or connect to an existing network. For easy testing, oysternet network is online, you can use it to deploy and run your contracts
+You need an environment to run contracts. You can either run your node locally or connect to an existing network. For easy testing, oysternet network is online, you can use it to deploy and run your contracts.
 
-To verify testnet is currently running, make sure the following URLs are all working for you:
+**To verify testnet is currently running, make sure the following URLs are all working for you:**
 
 http://rpc.oysternet.cosmwasm.com/status
 https://faucet.oysternet.cosmwasm.com/status
@@ -55,27 +55,27 @@ http://lcd.oysternet.cosmwasm.com/node_info
 
 Let's configure wasmd exec, point it to testnets, create wallet and ask tokens from faucet.
 
-First source the oysternet network configurations to the shell:
+**First source the oysternet network configurations to the shell:**
 
 ```
 $ source <(curl -sSL https://raw.githubusercontent.com/CosmWasm/testnets/master/oysternet-1/defaults.env)
 ```
 
-Setup the client:
+**Setup the client:**
 
 ```
 $ wasmd keys add fred
 $ wasmd keys add bob
 ```
 
-Requesting tokens from faucet:
+**Requesting tokens from faucet, incase if you ran out of tokens:**
 
 ```
 $ JSON=$(jq -n --arg addr $(wasmd keys show -a fred) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
 $ JSON=$(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
 ```
 
-Export wasmd Parameters
+**Export wasmd Parameters.**
 
 If you intend to use wasmd as client, we recommend you to setup these variables. Otherwise You will have to define type in node, chain id and gas-prices details with every command you execute
 
