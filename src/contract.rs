@@ -23,17 +23,17 @@ pub fn instantiate(
     Ok(Response::default())
 }
 
-// And declare a custom Error variant for the ones where you will want to make use of it
 #[entry_point]
 pub fn execute(
     deps: DepsMut,
     _env: Env,
-    info: MessageInfo,
+    _info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::Increment {} => try_increment(deps),
-        ExecuteMsg::Reset { count } => try_reset(deps, info, count),
+        ExecuteMsg::CreateVoter {address, name} => create_voter(deps, address, name),
+        ExecuteMsg::CastVote {voter, candidate} => cast_vote(deps, voter, candidate),
+        ExecuteMsg::Register { voter } => register(deps, voter),
     }
 }
 
