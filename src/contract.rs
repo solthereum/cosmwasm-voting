@@ -1,23 +1,22 @@
 use cosmwasm_std::{
-    entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
+    to_binary, Deps, entry_point, DepsMut, Env, MessageInfo, Response, Addr, StdResult, Binary
 };
 
 use crate::error::ContractError;
-use crate::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{State, STATE};
+use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, VotersResponse, CandidatesResponse, VotesResponse};
+use crate::state::{State, Voter, STATE, VOTES, Votes};
 
-// Note, you can use StdResult in some functions where you do not
-// make use of the custom errors
 #[entry_point]
 pub fn instantiate(
     deps: DepsMut,
     _env: Env,
-    info: MessageInfo,
-    msg: InstantiateMsg,
+    _info: MessageInfo,
+    _msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     let state = State {
-        count: msg.count,
-        owner: info.sender,
+        voters: vec![],
+        candidates: vec![],
+        voted: vec![]
     };
     STATE.save(deps.storage, &state)?;
 
