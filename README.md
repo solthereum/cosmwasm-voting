@@ -71,8 +71,8 @@ $ wasmd keys add bob
 **Requesting tokens from faucet, incase if you ran out of tokens:**
 
 ```
-$ JSON=$(jq -n --arg addr $(wasmd keys show -a fred) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
-$ JSON=$(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
+$ JSON = $(jq -n --arg addr $(wasmd keys show -a fred) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
+$ JSON = $(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"usponge" "address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.oysternet.cosmwasm.com/credit
 ```
 
 **Export wasmd Parameters.**
@@ -80,29 +80,89 @@ $ JSON=$(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"usponge" "addre
 If you intend to use wasmd as client, we recommend you to setup these variables. Otherwise You will have to define type in node, chain id and gas-prices details with every command you execute
 
 ```
-$ export NODE="--node $RPC"
-$ export TXFLAG="${NODE} --chain-id ${CHAIN_ID} --gas-prices 0.001usponge --gas auto --gas-adjustment 1.3"
-```
-## Creating a new repo from template
-
-Assuming you have a recent version of rust and cargo (v1.51.0+) installed
-(via [rustup](https://rustup.rs/)),
-then the following should get you a new repo to start a contract:
-
-First, install
-[cargo-generate](https://github.com/ashleygwilliams/cargo-generate).
-Unless you did that before, run this line now:
-
-```sh
-cargo install cargo-generate --features vendored-openssl
+$ export NODE = "--node $RPC"
+$ export TXFLAG = "${NODE} --chain-id ${CHAIN_ID} --gas-prices 0.001usponge --gas auto --gas-adjustment 1.3"
 ```
 
-Now, use it to create your new contract.
-Go to the folder in which you want to place it and run:
+**See how many codes we have now.**
 
+```
+$ wasmd query wasm list-code $NODE
+```
 
-**0.14 (latest)**
+**Gas is huge due to wasm size, but auto-zipping reduced this from 1.8M to around 600k**
 
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PROJECT_NAME
+```
+$ RES = $(wasmd tx wasm store target/wasm32-unknown-unknown/release/voting.wasm --from fred $TXFLAG -y)
+```
+
+**You can also get the code this way.**
+
+```
+$ CODE_ID = $(echo $RES | jq -r '.logs[0].events[0].attributes[-1].value')
+```
+
+**No contracts yet, this should return an empty list**
+
+```
+$ wasmd query wasm list-contract-by-code $CODE_ID $NODE --output json
+```
+
+## Instantiating the Contract
+
+**Instantiate contract and verify**
+
+```
+$ wasmd tx wasm instantiate $CODE_ID "{}" --from fred --label "voting 1" $TXFLAG -y
+```
+
+**Check the contract state**
+
+```
+$ wasmd query wasm list-contract-by-code $CODE_ID $NODE --output json
+$ CONTRACT = $(wasmd query wasm list-contract-by-code $CODE_ID $NODE --output json | jq -r '.contracts[-1]')
+```
+
+## Executing the Contract features
+
+**Create a single voter**
+
+```
+$ CREATE = $(jq -n --arg bob $(wasmd keys show -a bob) '{"create_voter":{"address":$bob,"name":"bob"}}')
+$ wasmd tx wasm execute  $CONTRACT "$CREATE" --from fred $TXFLAG -y
+```
+
+**Registering a voter as a candidate**
+
+```
+$ REG = $(jq -n --arg bob $(wasmd keys show -a bob) '{"register":{"voter":$bob}}')
+$ wasmd tx wasm execute  $CONTRACT "$REG" --from fred $TXFLAG -y
+```
+
+**Casting vote to particular candidate**
+
+```
+$ CASTVOTE = $(jq -n --arg bob $(wasmd keys show -a bob) --arg fred $(wasmd keys show -a fred) '{"cast_vote":{"voter":$fred,"candidate":$bob}}')
+$ wasmd tx wasm execute  $CONTRACT "$CASTVOTE" --from fred $TXFLAG -y
+```
+
+## Querying the Contract details
+
+**To find number of voters inside contract**
+
+```
+$ wasmd query wasm contract-state smart $CONTRACT '{"voters": {}}' $NODE
+```
+
+**To find number of candidates inside contract**
+
+```
+$ wasmd query wasm contract-state smart $CONTRACT '{"candidates": {}}' $NODE
+```
+
+**To find number of casted to a particular voter inside contract**
+
+```
+$ VOTES = $(jq -n --arg bob $(wasmd keys show -a bob) '{"votes":{"candidate":$bob}}')
+$ wasmd query wasm contract-state smart $CONTRACT "$VOTES1" $NODE
 ```
