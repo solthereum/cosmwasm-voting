@@ -132,3 +132,13 @@ fn query_voters(deps: Deps) -> StdResult<VotersResponse> {
     let state = STATE.load(deps.storage)?;
     Ok(VotersResponse { voters: state.voters })
 }
+
+fn query_candidates(deps: Deps) -> StdResult<CandidatesResponse> {
+    let state = STATE.load(deps.storage)?;
+    Ok(CandidatesResponse { candidates: state.candidates })
+}
+
+fn query_votes(deps: Deps, candidate: String) -> StdResult<VotesResponse> {
+    let votes = VOTES.load(deps.storage, &candidate)?;
+    Ok(VotesResponse { voters: votes.voters, count: votes.count })
+}
