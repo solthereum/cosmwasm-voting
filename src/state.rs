@@ -2,7 +2,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::Addr;
-use cw_storage_plus::Item;
+use cw_storage_plus::{Item, Map};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct State {
@@ -17,4 +17,11 @@ pub struct Voter {
     pub name: String
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct Votes {
+    pub voters: Vec<String>,
+    pub count: u64
+}
+
 pub const STATE: Item<State> = Item::new("state");
+pub const VOTES: Map<&str, Votes> = Map::new("votes");
