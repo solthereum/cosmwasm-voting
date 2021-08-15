@@ -37,23 +37,26 @@ pub fn execute(
     }
 }
 
-pub fn try_increment(deps: DepsMut) -> Result<Response, ContractError> {
-    STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
-        state.count += 1;
-        Ok(state)
-    })?;
-
-    Ok(Response::default())
+fn is_voter(voter: &Addr, state: &State) -> bool {
+    state.voters.iter().any(|i| &i.address == voter)
 }
 
-pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> Result<Response, ContractError> {
+pub fn create_voter(deps: DepsMut, voter_address: String, name: String) -> Result<Response, ContractError> {
+    let voter = Voter {
+        address: deps.api.addr_validate(&voter_address.as_str())?,
+        name: name
+    };
+    let state = STATE.load(deps.storage)?;
+
+    if is_voter(&voter.address, &state) {
+        return Err(ContractError::VoterAlreadyExists {});
+    }
+
     STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
-        if info.sender != state.owner {
-            return Err(ContractError::Unauthorized {});
-        }
-        state.count = count;
+        state.voters.push(voter);
         Ok(state)
     })?;
+
     Ok(Response::default())
 }
 
