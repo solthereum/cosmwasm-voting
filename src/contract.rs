@@ -100,6 +100,24 @@ pub fn cast_vote(deps: DepsMut, voter: String, candidate: String) -> Result<Resp
     Ok(Response::default())
 }
 
+pub fn register(deps: DepsMut, voter_address: String) -> Result<Response, ContractError> {
+    let address = deps.api.addr_validate(&voter_address.as_str())?;
+    let state = STATE.load(deps.storage)?;
+    if is_voter(&address, &state) == false {
+        return Err(ContractError::NotAVoter {});
+    }
+    STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
+        state.candidates.push(address);
+        Ok(state)
+    })?;
+    let votes = Votes {
+        voters: vec![],
+        count: 0
+    };
+    VOTES.save(deps.storage, &voter_address, &votes)?;
+    Ok(Response::default())
+}
+
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
