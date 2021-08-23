@@ -164,5 +164,5 @@ $ wasmd query wasm contract-state smart $CONTRACT '{"candidates": {}}' $NODE
 
 ```
 $ VOTES = $(jq -n --arg bob $(wasmd keys show -a bob) '{"votes":{"candidate":$bob}}')
-$ wasmd query wasm contract-state smart $CONTRACT "$VOTES1" $NODE
+$ wasmd query wasm contract-state smart $CONTRACT "$VOTES" $NODE
 ```
