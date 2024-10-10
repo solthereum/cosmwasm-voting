@@ -5,13 +5,6 @@ CosmWasm template is used to build Voting Smart Contract in Rust to run inside a
 
 ## Common setup
 
-**Clone the voting smart contract repo.**
-
-```
-$ git clone https://github.com/shaikrasheed99/cosmwasm-voting-smartcontract.git
-$ cd cosmwasm-voting-smartcontract
-```
-
 **Install dependencies.**
 
 Wasmd is the backbone of CosmWasm platform. It is the implementation of a Cosmoszone with wasm smart contracts enabled. To edit or run a contract, you need wasmd.
